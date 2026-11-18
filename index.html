@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>💖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#ff6b9d; --rose:#e63e7a; --blush:#ffe3ec; --cream:#fff8f5; --ink:#5a2a3c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Quicksand',system-ui,sans-serif;color:var(--ink);
+    background:linear-gradient(160deg,#ffe3ec 0%,#ffd6e7 40%,#ffeedd 100%);
+    background-attachment:fixed;min-height:100vh;overflow-x:hidden;
+  }
+  canvas#hearts{position:fixed;inset:0;pointer-events:none;z-index:0}
+  section{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;padding:60px 20px;text-align:center}
+  h1,h2,.script{font-family:'Dancing Script',cursive;color:var(--rose)}
+  h1{font-size:clamp(2.6rem,9vw,5rem);line-height:1.1}
+  h2{font-size:clamp(2rem,6vw,3.2rem);margin-bottom:28px}
+
+  /* ENVELOPE */
+  #intro p.hint{margin-top:22px;opacity:.75;animation:pulse 2s infinite}
+  .envelope{position:relative;width:min(280px,70vw);aspect-ratio:1.5;cursor:pointer;margin-top:30px;
+    transition:transform .3s;filter:drop-shadow(0 12px 20px rgba(230,62,122,.3))}
+  .envelope:hover{transform:scale(1.05) rotate(-2deg)}
+  .env-back{position:absolute;inset:0;background:#ff8fb5;border-radius:8px}
+  .env-flap{position:absolute;left:0;right:0;top:0;height:55%;background:#ff6b9d;
+    clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .6s;border-radius:8px 8px 0 0}
+  .env-front{position:absolute;inset:0;background:linear-gradient(135deg,#ffb3cd,#ff9dbf);
+    clip-path:polygon(0 0,50% 55%,100% 0,100% 100%,0 100%);border-radius:8px}
+  .env-heart{position:absolute;left:50%;top:50%;transform:translate(-50%,-30%);font-size:2.4rem;z-index:3;
+    animation:beat 1.2s infinite}
+  .envelope.open .env-flap{transform:rotateX(180deg)}
+  .envelope.open{pointer-events:none}
+
+  /* LETTER */
+  #letter{display:none}
+  .paper{background:var(--cream);max-width:620px;width:100%;padding:44px 34px;border-radius:18px;
+    box-shadow:0 20px 50px rgba(230,62,122,.25);position:relative;border:2px dashed #ffc2d7}
+  .paper::before{content:"💌";position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:2.4rem}
+  .paper p{font-size:1.15rem;line-height:1.9;min-height:9em;white-space:pre-line;text-align:left}
+  .paper .sign{margin-top:20px;font-family:'Dancing Script',cursive;font-size:1.9rem;color:var(--rose);text-align:right;opacity:0;transition:opacity 1s}
+  .cursor{display:inline-block;width:2px;height:1.1em;background:var(--rose);vertical-align:-3px;animation:blink 1s infinite}
+
+  /* REASONS */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px;max-width:900px;width:100%}
+  .card{background:rgba(255,255,255,.75);backdrop-filter:blur(6px);border-radius:20px;padding:26px 20px;
+    box-shadow:0 10px 25px rgba(230,62,122,.15);opacity:0;transform:translateY(30px);
+    transition:opacity .7s,transform .7s}
+  .card.show{opacity:1;transform:none}
+  .card:hover{transform:translateY(-6px) rotate(-1deg)}
+  .card .em{font-size:2.2rem;display:block;margin-bottom:10px}
+  .card p{font-weight:500;line-height:1.6}
+
+  /* QUESTION */
+  .btns{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:center;min-height:90px;position:relative}
+  button{font-family:inherit;font-weight:600;font-size:1.15rem;border:none;border-radius:50px;padding:14px 34px;cursor:pointer;
+    transition:transform .2s,box-shadow .2s}
+  .yes{background:linear-gradient(135deg,#ff6b9d,#e63e7a);color:#fff;box-shadow:0 8px 20px rgba(230,62,122,.4)}
+  .yes:hover{transform:scale(1.1)}
+  .no{background:#fff;color:var(--ink);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+
+  /* FINAL */
+  #final{display:none}
+  .big-heart{font-size:5rem;animation:beat 1.1s infinite;margin:10px 0}
+  .final-text{font-family:'Dancing Script',cursive;color:var(--rose);font-size:clamp(3rem,13vw,7rem);line-height:1}
+  .sub{margin-top:18px;font-size:1.2rem;max-width:480px;line-height:1.7}
+
+  @keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.18)}}
+  .env-heart{--x:1}
+  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+  @keyframes blink{50%{opacity:0}}
+  .floaty{animation:float 4s ease-in-out infinite}
+  @keyframes float{50%{transform:translateY(-10px)}}
+  .scroll-down{margin-top:30px;font-size:1.8rem;animation:float 2s infinite;text-decoration:none}
+</style>
+</head>
+<body>
+<canvas id="hearts"></canvas>
+
+<!-- 1. ENVELOPE -->
+<section id="intro">
+  <h1 class="floaty">Hey <span id="nm">You</span> 💕</h1>
+  <p style="margin-top:12px;font-size:1.15rem">I made something just for you…</p>
+  <div class="envelope" id="env" aria-label="Open the letter" role="button" tabindex="0">
+    <div class="env-back"></div><div class="env-flap"></div><div class="env-front"></div>
+    <div class="env-heart">❤️</div>
+  </div>
+  <p class="hint">tap the envelope to open it</p>
+</section>
+
+<!-- 2. LETTER -->
+<section id="letter">
+  <div class="paper">
+    <p id="typed"></p><span class="cursor" id="cur"></span>
+    <div class="sign" id="sign"></div>
+  </div>
+  <a class="scroll-down" href="#reasons" id="down" style="display:none">⬇️</a>
+</section>
+
+<!-- 3. REASONS -->
+<section id="reasons">
+  <h2>Little reasons I love you ✨</h2>
+  <div class="cards" id="cards"></div>
+</section>
+
+<!-- 4. QUESTION -->
+<section id="ask">
+  <h2>One last question…</h2>
+  <p style="font-size:1.3rem;margin-bottom:28px">Will you let me keep loving you, forever? 🥺</p>
+  <div class="btns" id="btns">
+    <button class="yes" id="yes">Yes, always 💖</button>
+    <button class="no" id="no">No 💔</button>
+  </div>
+</section>
+
+<!-- 5. FINAL -->
+<section id="final">
+  <div class="big-heart">💗</div>
+  <div class="final-text">I love you</div>
+  <p class="sub" id="finalSub"></p>
+  <p style="margin-top:30px;opacity:.7">(scroll up to read it all again 🌸)</p>
+</section>
+
+<script>
+/* ============ ✏️ EDIT THESE ✏️ ============ */
+const CONFIG = {
+  herName: "Rasmalai",          // her name or nickname
+  yourName: "Gabugosha",       // your name
+  letter:
+`From the moment you came into my life, everything got softer, brighter and a little bit more magical.
+
+You make my ordinary days feel like favourite songs, and my worst days feel like they'll be okay.
+
+I don't know how to say it big enough, so I'll say it simply, and I'll mean it every single day:
+
+I love you. 💖`,
+  reasons: [
+    ["😊","Your smile makes my whole world brighter."],
+    ["🤗","Being with you feels like home."],
+    ["😂","You make me laugh like nobody else can."],
+    ["🌙","You're my favourite person to talk to, even at 2 AM."],
+    ["🌸","You're kind, beautiful and wonderfully you."],
+    ["✨","Because of you, I believe in forever."]
+  ],
+  finalLine: "You're my today, my tomorrow and all my forevers."
+};
+/* ========================================= */
+
+document.getElementById('nm').textContent = CONFIG.herName;
+document.getElementById('finalSub').textContent = CONFIG.finalLine + " — " + CONFIG.yourName;
+
+/* ---------- floating hearts background ---------- */
+const cv = document.getElementById('hearts'), cx = cv.getContext('2d');
+let W, H, hearts = [];
+function resize(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+addEventListener('resize', resize); resize();
+const glyphs = ['💗','💖','💕','🌸','✨','💞'];
+function spawn(burst){
+  hearts.push({
+    x: burst ? burst.x : Math.random()*W,
+    y: burst ? burst.y : H+30,
+    s: 12+Math.random()*22,
+    v: burst ? -(1+Math.random()*3) : -(0.4+Math.random()*1),
+    dx: burst ? (Math.random()-.5)*4 : (Math.random()-.5)*.6,
+    a: .25+Math.random()*.5,
+    g: glyphs[Math.floor(Math.random()*glyphs.length)],
+    ph: Math.random()*6
+  });
+}
+function loop(){
+  cx.clearRect(0,0,W,H);
+  if(Math.random()<.08) spawn();
+  hearts = hearts.filter(h => h.y > -40);
+  for(const h of hearts){
+    h.y += h.v; h.ph += .03; h.x += h.dx + Math.sin(h.ph)*.4;
+    cx.globalAlpha = h.a; cx.font = h.s + 'px serif'; cx.fillText(h.g, h.x, h.y);
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+function burst(x, y, n=40){ for(let i=0;i<n;i++) spawn({x,y}); }
+addEventListener('click', e => burst(e.clientX, e.clientY, 6));
+
+/* ---------- envelope -> letter ---------- */
+const env = document.getElementById('env');
+function openLetter(e){
+  if(env.classList.contains('open')) return;
+  env.classList.add('open');
+  const r = env.getBoundingClientRect();
+  burst(r.left + r.width/2, r.top + r.height/2, 40);
+  setTimeout(() => {
+    const L = document.getElementById('letter');
+    L.style.display = 'flex';
+    L.scrollIntoView({behavior:'smooth'});
+    typeLetter();
+  }, 700);
+}
+env.addEventListener('click', openLetter);
+env.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') openLetter(); });
+
+function typeLetter(){
+  const el = document.getElementById('typed'), text = CONFIG.letter;
+  let i = 0;
+  (function step(){
+    el.textContent = text.slice(0, ++i);
+    if(i < text.length){
+      const c = text[i-1];
+      setTimeout(step, c==='.'||c==='\n' ? 260 : 38);
+    } else {
+      document.getElementById('cur').style.display = 'none';
+      const s = document.getElementById('sign');
+      s.textContent = "Forever yours, " + CONFIG.yourName + " 💌";
+      s.style.opacity = 1;
+      document.getElementById('down').style.display = 'block';
+    }
+  })();
+}
+
+/* ---------- reason cards ---------- */
+const cards = document.getElementById('cards');
+CONFIG.reasons.forEach(([em, t]) => {
+  const d = document.createElement('div');
+  d.className = 'card';
+  d.innerHTML = '<span class="em">' + em + '</span><p></p>';
+  d.querySelector('p').textContent = t;
+  cards.appendChild(d);
+});
+const io = new IntersectionObserver(es => es.forEach((e,i) => {
+  if(e.isIntersecting){ setTimeout(() => e.target.classList.add('show'), i*120); io.unobserve(e.target); }
+}), {threshold:.2});
+document.querySelectorAll('.card').forEach(c => io.observe(c));
+
+/* ---------- the question ---------- */
+const no = document.getElementById('no'), yes = document.getElementById('yes');
+const noTexts = ["No 💔","Are you sure? 🥺","Really?? 😢","Think again 💭","Pretty please 🥹","Nope can't click 😜"];
+let tries = 0, yesScale = 1;
+function dodge(e){
+  e.preventDefault();
+  tries++;
+  no.textContent = noTexts[Math.min(tries, noTexts.length-1)];
+  yesScale = Math.min(yesScale + .15, 2);
+  yes.style.transform = 'scale(' + yesScale + ')';
+  const box = document.getElementById('btns').getBoundingClientRect();
+  no.style.position = 'absolute';
+  no.style.left = Math.max(0, Math.random()*(box.width - no.offsetWidth)) + 'px';
+  no.style.top  = (Math.random()*160 - 40) + 'px';
+}
+no.addEventListener('mouseenter', dodge);
+no.addEventListener('touchstart', dodge, {passive:false});
+no.addEventListener('click', dodge);
+
+yes.addEventListener('click', () => {
+  const f = document.getElementById('final');
+  f.style.display = 'flex';
+  f.scrollIntoView({behavior:'smooth'});
+  for(let i=0;i<5;i++) setTimeout(() => burst(Math.random()*W, H*.8, 30), i*300);
+});
+</script>
+</body>
+</html>
